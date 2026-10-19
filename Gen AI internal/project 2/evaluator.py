@@ -25,7 +25,6 @@ def evaluate_sample_image(sample_id: str, generated_description: str, extracted_
     unmatched_gt = []
     
     for elem in gt_elements:
-        # Check if core keywords of ground truth element appear in generated description
         keywords = [w.lower() for w in elem.split() if len(w) > 3 and w.lower() not in ["with", "from", "that", "this", "their"]]
         match_count = sum(1 for kw in keywords if kw in desc_lower)
         if match_count >= 1:
@@ -33,7 +32,6 @@ def evaluate_sample_image(sample_id: str, generated_description: str, extracted_
         else:
             unmatched_gt.append(elem)
             
-    # Compute grounding score (base reference score modified slightly by actual coverage)
     base_score = ref_eval["grounding_score"]
     coverage_ratio = len(matched_elements) / max(len(gt_elements), 1)
     adjusted_score = int(base_score * 0.7 + (coverage_ratio * 100) * 0.3)
@@ -67,7 +65,8 @@ def evaluate_custom_image(generated_description: str, extracted_elements: List[s
     
     unsupported = []
     if found_speculations:
-        unsupported.append(f"Speculative language detected ('{", ".join(found_speculations)}'). These inferences are not directly verified by image pixels alone.")
+        joined_specs = ", ".join(found_speculations)
+        unsupported.append(f"Speculative language detected ('{joined_specs}'). These inferences are not directly verified by image pixels alone.")
     else:
         unsupported.append("Uncertain context: Inferences regarding personal intent, specific ownership, or internal hardware/software components remain unverified.")
         
